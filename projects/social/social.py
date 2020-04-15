@@ -1,6 +1,24 @@
+import random
+
+
+class Queue:
+    def __init__(self):
+        self.store = []
+
+    def enqueue(self, item):
+        self.store.append(item)
+
+    def dequeue(self):
+        return self.store.pop(0)
+
+    def size(self):
+        return len(self.store)
+
+
 class User:
     def __init__(self, name):
         self.name = name
+
 
 class SocialGraph:
     def __init__(self):
@@ -29,36 +47,40 @@ class SocialGraph:
         self.friendships[self.last_id] = set()
 
     def populate_graph(self, num_users, avg_friendships):
-        """
-        Takes a number of users and an average number of friendships
-        as arguments
-
-        Creates that number of users and a randomly distributed friendships
-        between those users.
-
-        The number of users must be greater than the average number of friendships.
-        """
-        # Reset graph
         self.last_id = 0
         self.users = {}
         self.friendships = {}
-        # !!!! IMPLEMENT ME
-
-        # Add users
-
-        # Create friendships
+        for i in range(num_users):
+            self.users[i] = set()
+            self.friendships[i] = set()
+        limit_friends = avg_friendships * 2
+        for i in range(num_users):
+            friends_roll = int(random.random()*limit_friends)
+            for j in range(friends_roll):
+                userRoll = int(random.random()*num_users)
+                if userRoll == i:
+                    continue
+                else:
+                    self.friendships[i].add(userRoll)
+                    self.friendships[userRoll].add(i)
 
     def get_all_social_paths(self, user_id):
-        """
-        Takes a user's user_id as an argument
+        visited = {}
+        unmapped = Queue()
+        unmapped.enqueue([user_id])
+        visited[user_id] = True
+        while unmapped.size():
+            path = unmapped.dequeue()
+            target = path[-1]
+            if target == user_id:
+                path.pop()
+            for friend in self.friendships[target]:
+                if friend not in visited:
+                    newPath = list(path) + [friend]
+                    visited[friend] = newPath
+                    unmapped.enqueue(newPath)
 
-        Returns a dictionary containing every user in that user's
-        extended network with the shortest friendship path between them.
-
-        The key is the friend's ID and the value is the path.
-        """
-        visited = {}  # Note that this is a dictionary, not a set
-        # !!!! IMPLEMENT ME
+        del visited[user_id]
         return visited
 
 
